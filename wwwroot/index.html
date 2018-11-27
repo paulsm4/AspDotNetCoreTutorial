@@ -1,4 +1,5 @@
 ﻿<!DOCTYPE html>
+<html>
 <head>
     <meta charset="UTF-8">
     <title>Manage Car</title>
@@ -30,7 +31,15 @@
 </head>
 <body>
     <h1>Manage Car</h1>
-    <h3>Add</h3>
+
+    <h3>Login:</h3>
+    <form action="javascript:void(0);" method="POST" onsubmit="login()">
+        <input type="text" id="login-email"  placeholder="email address">
+        <input type="password" id="login-password"  placeholder="***">
+        <input type="submit" value="Login">
+    </form>
+
+    <h3>Add Car:</h3>
     <form action="javascript:void(0);" method="POST" onsubmit="addItem()">
         <input type="text" id="add-name" placeholder="Ferrari">
         <input type="text" id="add-mark" placeholder="F12">

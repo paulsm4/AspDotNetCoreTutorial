@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using AutoMapper;
 using System;
 
-namespace demobackend.AutoMapperProfile
+namespace ManageCar.AutoMapperProfile
 {
     public class AutoMapperProfileConfiguration : Profile
     {

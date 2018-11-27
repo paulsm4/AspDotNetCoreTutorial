@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace ManageCar.Controllers
 {
-        //[Authorize]
+        [Authorize]
         [Route("api/[controller]")]
         public class ManageCarController : Controller
         {

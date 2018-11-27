@@ -1,5 +1,6 @@
-﻿const uri = "api/ManageCar";
-let todos = null;
+﻿const carUri = "api/ManageCar";
+const accountUri = "Account";
+
 function getCount(data) {
     const el = $("#counter");
     let name = "cars";
@@ -13,14 +14,40 @@ function getCount(data) {
     }
 }
 
-$(document).ready(function () {
-    getData();
-});
+//$(document).ready(function () {
+//    login();
+//});
+
+function login() {
+    const item = {
+        email: $("#login-email").val(),
+        password: $("#login-password").val(),
+        rememberMe: true
+    };
+    console.log("Login credentials:", item);
+
+    $.ajax({
+        type: "POST",
+        accepts: "application/json",
+        url: accountUri + "/Login",
+        contentType: "application/json",
+        data: JSON.stringify(item),
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.error("ERROR:".jqXHR);
+            console.error("textStatus=" + textStatus + ", errorThrown=" + errorThrown + "...");
+            alert("ERROR: " + textStatus + ": " + errorThrown);
+        },
+        success: function (result) {
+            alert(result);
+            getData();
+        }
+    });
+}
 
 function getData() {
     $.ajax({
         type: "GET",
-        url: uri,
+        url: carUri,
         cache: false,
         success: function (data) {
             const tBody = $("#cars");
@@ -69,7 +96,7 @@ function addItem() {
     $.ajax({
         type: "POST",
         accepts: "application/json",
-        url: uri,
+        url: carUri,
         contentType: "application/json",
         data: JSON.stringify(item),
         error: function (jqXHR, textStatus, errorThrown) {
@@ -86,7 +113,7 @@ function addItem() {
 
 function deleteItem(id) {
     $.ajax({
-        url: uri + "/" + id,
+        url: carUri + "/" + id,
         type: "DELETE",
         success: function (result) {
             getData();
@@ -115,7 +142,7 @@ $(".my-form").on("submit", function () {
     };
 
     $.ajax({
-        url: uri + "/" + $("#edit-id").val(),
+        url: carUri + "/" + $("#edit-id").val(),
         type: "PUT",
         accepts: "application/json",
         contentType: "application/json",

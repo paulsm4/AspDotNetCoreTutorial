@@ -8,8 +8,8 @@ using ManageCar.Models.AccountViewModels;
 
 namespace ManageCar.Controllers
 {
-    //[Authorize]
-    [Route("api/[controller]/[action]")]
+    [Authorize]
+    [Route("[controller]/[action]")]
     public class AccountController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
