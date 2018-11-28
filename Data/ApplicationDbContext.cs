@@ -45,8 +45,17 @@ namespace ManageCar.Data
                 .AddJsonFile("appsettings.json")
                 .Build();
             var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
-            builder.UseSqlServer(connectionString);
+            string env = System.Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            string connectionString;
+            if (!string.IsNullOrEmpty(env) && env.Equals("Linux"))
+            {
+                connectionString = configuration.GetConnectionString("mySqlConnection");
+                builder.UseMySql(connectionString);
+            } else
+            {
+                connectionString = configuration.GetConnectionString("DefaultConnection");
+                builder.UseSqlServer(connectionString);
+            }
             return new ApplicationDbContext(builder.Options);
         }
     }

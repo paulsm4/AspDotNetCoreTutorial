@@ -82,3 +82,75 @@
       <= Must specify "app.UseStaticFiles();" in order to serve static content from wwwroot
    - Properties\launchSettings.json
       <= Changed root page to "http://localhost:5000/", to pick up index.html
+
+---------------------------------------------------------------------------------------------------
+11.27.18
+--------
+* Added Mysql support ("LocalDB" unsupported on Linux):
+  1. Set ASPNETCOR_ENVIRONMENT (default environment == "Production")
+       export ASPNETCORE_ENVIRONMENT=Linux 
+	   
+  2. Create mysql DB:
+     - mysql -uroot -p*** mysql
+	     create database ManageCarDb;
+         grant all privileges on ManageCarDb.* to 'dotnetuser'@'localhost' identified by 'dotnetuser';
+           <= The command is no longer "update user set password..." (!!!)
+         flush privileges;
+		 
+  3. Added second, MySql connection string to appsettings.json:
+       "ConnectionStrings": {
+         "DefaultConnection": "Server=(LocalDb)\\MSSQLLocalDB;Database=ManageCarDB;Trusted_Connection=True;MultipleActiveResultSets=true",
+         "mySqlConnection": "Server=localhost;port=3306;database=ManageCarDb;uid=dotnetuser;password=dotnetuser"
+       },
+	   
+  4. Modified Startup.cs and ApplicationDbContext.cs to conditionally use one or the other DB connection:
+     - Startup.cs:
+         public void ConfigureServices(IServiceCollection services) {
+            string env = System.Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            string connectionString;
+            if (!string.IsNullOrEmpty(env) && env.Equals("Linux")) {
+               connectionString = Configuration.GetConnectionString("mySqlConnection");
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseMySql(connectionString));
+            } else {
+                connectionString = Configuration.GetConnectionString("DefaultConnection");
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlServer(connectionString));
+            }
+			<= Similar code in ApplicationDbContext.cs...
+
+  5. Import MySql data provider for MySql		
+       dotnet add MySql.Data.EntityFrameworkCore =>
+Successfully installed 'Google.Protobuf 3.5.1' to ManageCar
+Successfully installed 'MySql.Data 8.0.13' to ManageCar
+Successfully installed 'MySql.Data.EntityFrameworkCore 8.0.13' to ManageCar
+Successfully installed 'System.Configuration.ConfigurationManager 4.4.1' to ManageCar
+Successfully installed 'System.Security.Cryptography.ProtectedData 4.4.0' to ManageCar
+	   
+  6. Cleanup binaries, create new migration, build tables:
+      export ASPNETCORE_ENVIRONMENT=Linux
+      rm -rf obj/* bin/*
+      <= Delete binaries
+      dotnet restore
+      <= Brings in NuGet packages  
+      dotnet ef migrations remove --verbose =>
+Table 'ManageCarDb.__EFMigrationsHistory' doesn't exist
+      <= Similar error with "dotnet ef database update -v"
+	     Oracle MySql driver for Asp.Net Core appears defective
+
+  7. Removed Oracle library and installed "Pomelo.EntityFrameworkCore.MySql" instead:
+       dotnet ef migrations list => NONE
+       dotnet restore => OK
+       dotnet ef migrations add linuxMigration -c ApplicationDbContext -v => OK
+       dotnet ef database update -v => OK
+       <= OK!  So we have ourselfs a database!
+	   
+		 
+
+	 
+  
+  
+  
+
+	 
+  

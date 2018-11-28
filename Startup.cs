@@ -25,9 +25,22 @@ namespace ManageCar
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            
+            string env = System.Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            string connectionString;
+            if (!string.IsNullOrEmpty(env) && env.Equals("Linux"))
+            {
+               connectionString = Configuration.GetConnectionString("mySqlConnection");
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseMySql(connectionString));
+            }
+            else
+            {
+                connectionString = Configuration.GetConnectionString("DefaultConnection");
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlServer(connectionString));
+            }
+
+
             services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
             {
                builder.WithOrigins("http://localhost:4200");
@@ -65,12 +78,12 @@ namespace ManageCar
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-             if (env.IsDevelopment())
+            if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-             // Enable middleware to serve generated Swagger as a JSON endpoint.
-            app.UseCors("MyPolicy");  
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseCors("MyPolicy");
             app.UseSwagger();
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
@@ -81,7 +94,7 @@ namespace ManageCar
             //app.UseIdentity();  // Deprecated
             app.UseAuthentication();
             app.UseStaticFiles();
-            app.UseMvc();     
+            app.UseMvc();
         }
     }
 }
